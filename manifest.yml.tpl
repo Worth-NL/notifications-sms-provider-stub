@@ -18,3 +18,4 @@ applications:
     GOVERSION: go1.21
     MMG_CALLBACK_URL: https://{{API_HOSTNAME}}/notifications/sms/mmg
     FIRETEXT_CALLBACK_URL: https://{{API_HOSTNAME}}/notifications/sms/firetext
+    SPRYNG_CALLBACK_URL: https://{{API_HOSTNAME}}/notifications/sms/spryng
