@@ -11,7 +11,7 @@
         "bin/sms-provider-stub"
       ],
       "problemMatcher": [
-        "$tsc"
+        "$go"
       ],
       "presentation": {
         "reveal": "always"
