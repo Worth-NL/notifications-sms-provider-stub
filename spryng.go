@@ -8,18 +8,21 @@ import (
 	"net/url"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 )
+
+type SpryngRequest struct {
+	Originator string   `json:"originator"`
+	Recipients []string `json:"recipients"`
+	Body       string   `json:"body"`
+	Reference  string   `json:"reference"`
+	Route      string   `json:"route"`
+	Encoding   string   `json:"encoding"`
+}
 
 type SpryngResponse struct {
 	Description string `json:"description"`
 	Code        int    `json:"code"`
-}
-
-type SpryngCallback struct {
-	Status    string `json:"status"`
-	Reference string `json:"reference"`
 }
 
 var SPRYNG_MIN_DELAY_MS int
@@ -44,30 +47,32 @@ func init() {
 }
 
 func SpryngEndpoint(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
+	var reqData SpryngRequest
+	if err := json.NewDecoder(r.Body).Decode(&reqData); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	log.Printf("Spryng received message %s:\n\n    %s\n\n", r.FormValue("reference"), r.FormValue("message"))
+	log.Printf("Spryng received message %s:\n\n    %s\n\n", reqData.Reference, reqData.Body)
 
 	json.NewEncoder(w).Encode(SpryngResponse{Code: 0, Description: "SMS successfully queued"})
+	go SpryngSendCallback(reqData.Reference)
 }
 
-func SpryngSendCallback(reference string, to string) {
-	time.Sleep(time.Duration(SPRYNG_MIN_DELAY_MS + rand.Intn(SPRYNG_MAX_DELAY_MS-SPRYNG_MIN_DELAY_MS)))
+func SpryngSendCallback(reference string) {
+	time.Sleep(time.Duration(SPRYNG_MIN_DELAY_MS+rand.Intn(SPRYNG_MAX_DELAY_MS-SPRYNG_MIN_DELAY_MS)) * time.Millisecond)
 
-	data := url.Values{
-		"status":    {"0"},
-		"reference": {reference},
-		"mobile":    {to},
+	params := url.Values{
+		"STATUS":     {"10"},
+		"REASONCODE": {"0"},
+		"REFERENCE":  {reference},
 	}
 
-	formDataReader := strings.NewReader(data.Encode())
-
-	req, err := http.NewRequest("POST", SPRYNG_CALLBACK_URL, formDataReader)
-
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req, err := http.NewRequest("GET", SPRYNG_CALLBACK_URL+"?"+params.Encode(), nil)
+	if err != nil {
+		log.Printf("Spryng callback request build failed: %s\n", err.Error())
+		return
+	}
 
 	ecs_header := os.Getenv("USE_ECS_APPS")
 	if ecs_header == "true" {
