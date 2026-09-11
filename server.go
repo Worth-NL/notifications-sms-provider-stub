@@ -10,6 +10,7 @@ func main() {
 	http.HandleFunc("/mmg", MmgEndpoint)
 	http.HandleFunc("/firetext", FiretextEndpoint)
 	http.HandleFunc("/spryng", SpryngEndpoint)
+	http.HandleFunc("/api/messages", MessagesEndpoint)
 	port := getenv("PORT", "6300")
 	log.Printf("Listening on port %s...\n", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

@@ -54,6 +54,11 @@ func SpryngEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("Spryng received message %s:\n\n    %s\n\n", reqData.Reference, reqData.Body)
+	to := ""
+	if len(reqData.Recipients) > 0 {
+		to = reqData.Recipients[0]
+	}
+	recordMessage("spryng", to, reqData.Body, reqData.Reference)
 
 	json.NewEncoder(w).Encode(SpryngResponse{Code: 0, Description: "SMS successfully queued"})
 	go SpryngSendCallback(reqData.Reference)
