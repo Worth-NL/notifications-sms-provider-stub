@@ -8,7 +8,8 @@
       "mode": "debug",
       "program": "${workspaceFolder}",
       "console": "integratedTerminal",
-      "output": "${workspaceFolder}/bin/__debug_bin"
+      "output": "${workspaceFolder}/bin/__debug_bin",
+      "envFile": "${workspaceFolder}/.env"
     }
   ]
 }

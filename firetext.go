@@ -51,6 +51,7 @@ func FiretextEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("Firetext received message %s:\n\n    %s\n\n", r.FormValue("reference"), r.FormValue("message"))
+	recordMessage("firetext", r.FormValue("to"), r.FormValue("message"), r.FormValue("reference"))
 
 	json.NewEncoder(w).Encode(FiretextResponse{Code: 0, Description: "SMS successfully queued"})
 	go FiretextSendCallback(r.FormValue("reference"), r.FormValue("to"))

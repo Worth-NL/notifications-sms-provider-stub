@@ -59,6 +59,7 @@ func MmgEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("MMG received message %s:\n\n    %s\n\n", reqData.Cid, reqData.Msg)
+	recordMessage("mmg", reqData.MSISDN, reqData.Msg, reqData.Cid)
 
 	json.NewEncoder(w).Encode(MmgResponse{Reference: rand.Intn(100000)})
 	go MmgSendCallback(reqData.Cid, reqData.MSISDN)
