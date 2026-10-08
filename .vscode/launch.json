@@ -8,6 +8,9 @@
       "mode": "debug",
       "program": "${workspaceFolder}",
       "console": "integratedTerminal",
+      "env": {
+        "PORT": "6300"
+      },
       "output": "${workspaceFolder}/bin/__debug_bin"
     }
   ]
